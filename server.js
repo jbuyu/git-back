@@ -1,26 +1,31 @@
+require("dotenv").config();
 const express = require("express");
-
-const app = express();
-const PORT = process.env.PORT || 5000;
 const cors = require("cors");
+const PORT = process.env.PORT || 4000;
+const app = express();
+const mongoose = require("mongoose");
 
+//middleware
 app.use(cors());
-app.use(express.json);
-app.use(express.urlencoded({ extended: false }));
+//mongoose
 
+mongoose.connect(process.env.MONGO_URI, {
+  useUnifiedTopology: true,
+  useNewUrlParser: true,
+});
+const connection = mongoose.connection;
+
+connection.once("open", function () {
+  console.log("MongoDB database connection established successfully");
+});
+
+//routes
 app.get("/", (req, res) => {
-  res.json({
-    message: "howdy-api",
-  });
+  res.send("Howdy!");
 });
 
 app.post("/", (req, res) => {
-  let { data } = req.body;
-  res.json({
-    message: "doc-api",
-  });
+  let { repoDat } = req.body;
 });
 
-app.listen(PORT, () => {
-  console.log("listening on port,", PORT);
-});
+app.listen(PORT, () => console.log("Listening on port 3000!"));
