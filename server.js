@@ -47,7 +47,7 @@ app.post("/repos", (req, res) => {
     ...newRepoData,
   });
   let repo = Repo.exists({ repoName: newRepoData.repoName });
-  if (!repo) {
+  if (repo) {
     repoData.save(function (error) {
       console.log("saved");
       if (error) {
@@ -57,6 +57,19 @@ app.post("/repos", (req, res) => {
   } else {
     console.log("already exists");
   }
+});
+
+app.get("/favRepos", async (req, res) => {
+  const repos = await Repo.find();
+  var result = repos.reduce((unique, o) => {
+    if (!unique.some((obj) => obj.label === o.label && obj.value === o.value)) {
+      unique.push(o);
+    }
+    return unique;
+  }, []);
+  res.send({
+    result,
+  });
 });
 
 app.listen(PORT, () => console.log("Listening on port 4000!"));
