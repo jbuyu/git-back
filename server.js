@@ -28,7 +28,7 @@ connection.once("open", function () {
 
 const repoSchema = new Schema({
   owner: String,
-  repoName: { type: String, required: true },
+  repoName: String,
   issues: String,
   forks: Number,
   stars: Number,
@@ -46,17 +46,18 @@ app.post("/repos", (req, res) => {
   let repoData = new Repo({
     ...newRepoData,
   });
-  let repo = Repo.exists({ repoName: newRepoData.repoName });
-  if (repo) {
-    repoData.save(function (error) {
-      console.log("saved");
-      if (error) {
-        console.error(error);
-      }
-    });
-  } else {
-    console.log("already exists");
-  }
+  Repo.findOne({ repoName: newRepoData.repoName }).then((repo) => {
+    if (repo) {
+      console.log("already saved");
+    } else {
+      repoData.save(function (error) {
+        console.log("saved");
+        if (error) {
+          console.error(error);
+        }
+      });
+    }
+  });
 });
 
 app.get("/favRepos", async (req, res) => {
